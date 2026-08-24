@@ -129,6 +129,18 @@ h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
 .nav__links a:not(.btn) { font-size: 14px; color: var(--ink-3); text-decoration: none; }
 .nav__links a:not(.btn):hover { color: var(--ink); }
 
+/* Переключатель языка — сегментированный тумблер, как в исходном холсте.
+   Активный язык — белая пилюля, второй — ссылка на другую версию. */
+.lang {
+  display: inline-flex; align-items: center; flex-shrink: 0;
+  border-radius: 999px; background: var(--wash); padding: 2px;
+  font-size: 12.5px; font-weight: 600;
+}
+.lang__on, .lang__off { padding: 4px 10px; border-radius: 999px; line-height: 1; }
+.lang__on { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.1); }
+.lang__off { color: var(--ink-3); text-decoration: none; }
+.lang__off:hover { color: var(--ink); }
+
 .btn {
   display: inline-flex; align-items: center; gap: 10px;
   border: 0; cursor: pointer; text-decoration: none;
@@ -480,7 +492,9 @@ h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
   .nav { border-radius: 14px 14px 0 0; }
 
   /* Разделы уезжают: на телефоне остаётся марка и «Скачать». */
-  .nav__links a:not(.btn) { display: none; }
+  /* > a: прячем только прямые ссылки (GitHub). Переключатель языка лежит
+     во вложенном span и остаётся — он нужен и на телефоне. */
+  .nav__links > a:not(.btn) { display: none; }
 
   .hero { padding: 48px var(--pad) 56px; }
   .hero h1 { font-size: 38px; }
