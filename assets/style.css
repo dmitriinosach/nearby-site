@@ -68,7 +68,11 @@ img { max-width: 100%; height: auto; display: block; }
   width: 100%;
   max-width: var(--shell);
   margin: 0 auto;
-  overflow: hidden;
+  /* НЕ overflow: hidden — оно ломает position: sticky у шапки. Скруглять
+     углы карточки нечему клипать: фон сам обрезается по border-radius, а
+     свечение героя и макет окна уже клипаются своими контейнерами
+     (.hero и .hero__shot — у обоих overflow: hidden). Верх шапки скруглён
+     отдельно, чтобы совпасть с картой. */
   border-radius: 16px;
   box-shadow: 0 32px 80px -28px rgb(0 0 0 / 0.4);
   background: linear-gradient(170deg, var(--card-from), var(--card-to));
@@ -92,10 +96,17 @@ h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
 /* ── шапка ────────────────────────────────────────────────────────── */
 
 .nav {
+  position: sticky; top: 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px;
   padding: 22px var(--pad);
   border-bottom: 1px solid var(--hair);
+  border-radius: 16px 16px 0 0;
+  /* Матовая подложка: когда шапка залипает и наезжает на контент, текст
+     под ней не должен просвечивать. Тот же приём, что в самом приложении. */
+  background: rgb(255 255 255 / 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
@@ -271,6 +282,30 @@ h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
 }
 .shots figcaption { margin-top: 12px; font-size: 14px; color: var(--ink-3); }
 
+/* ── SEO-текст и FAQ ──────────────────────────────────────────────── */
+
+.prose h2, .faq h2 { margin: 0 0 20px; font-size: 32px; font-weight: 700; letter-spacing: -0.03em; text-wrap: balance; }
+.prose h2 { max-width: 24ch; }
+.prose p { margin: 0 0 16px; font-size: 16px; line-height: 1.65; color: var(--ink-2); max-width: 68ch; }
+.prose p:last-child { margin-bottom: 0; }
+.prose strong { color: var(--ink); font-weight: 600; }
+
+.faq h2 { margin-bottom: 24px; }
+.faq__list { display: grid; gap: 10px; max-width: 760px; }
+.faq details {
+  border: 1px solid var(--hair); border-radius: 12px; background: #fff;
+  padding: 14px 18px; box-shadow: 0 2px 8px -5px rgb(0 0 0 / 0.1);
+}
+.faq summary {
+  cursor: pointer; list-style: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  font-size: 16px; font-weight: 600;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; color: var(--ink-4); font-weight: 400; font-size: 20px; line-height: 1; }
+.faq details[open] summary::after { content: '\2212'; }
+.faq details p { margin: 12px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink-3); }
+
 /* ── скачать ──────────────────────────────────────────────────────── */
 
 .grab { text-align: center; }
@@ -415,13 +450,23 @@ h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
 
 /* ── экраны поуже ─────────────────────────────────────────────────── */
 
+/* Двухколоночный герой в полосе 1040–1200 зажимал заголовок в узкую
+   колонку (три строки) и оставлял макет окна на 200px выше текста.
+   Складываем в одну колонку по центру уже здесь — и на 1100, и на 900
+   герой выходит ровным. minmax(0, 1fr), а не 1fr: иначе колонка растёт
+   под макет окна. */
+@media (max-width: 1200px) {
+  .hero__grid { grid-template-columns: minmax(0, 1fr); gap: 48px; justify-items: center; text-align: center; }
+  .hero__shot { transform: none; }
+  .hero .kicker { text-align: center; }
+  .hero h1 { font-size: 54px; max-width: 20ch; margin-inline: auto; }
+  .hero__lead { margin-inline: auto; }
+  .hero__cta { align-items: center; }
+}
+
 @media (max-width: 1040px) {
   :root { --pad: 40px; }
   .page { padding: 40px 32px 0; }
-  /* minmax(0, 1fr), а не 1fr: иначе колонка растёт под макет окна. */
-  .hero__grid { grid-template-columns: minmax(0, 1fr); gap: 56px; justify-items: center; }
-  .hero__shot { transform: none; }
-  .hero h1 { font-size: 52px; }
   .split { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .skins { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -432,6 +477,7 @@ h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
   .page { padding: 24px 16px 0; }
   .band { padding: 56px var(--pad); }
   .shell { border-radius: 14px; }
+  .nav { border-radius: 14px 14px 0 0; }
 
   /* Разделы уезжают: на телефоне остаётся марка и «Скачать». */
   .nav__links a:not(.btn) { display: none; }
@@ -440,6 +486,7 @@ h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
   .hero h1 { font-size: 38px; }
   .hero__lead { font-size: 17px; }
   .band > h3, .split h3, .grab h3 { font-size: 27px; }
+  .prose h2, .faq h2 { font-size: 24px; }
 
   .cards, .shots { grid-template-columns: minmax(0, 1fr); }
   .skins { grid-template-columns: repeat(2, minmax(0, 1fr)); }
