@@ -1,0 +1,453 @@
+/* Рядом — лендинг.
+   Собран из холста Claude Design (lan_chat_site/*.dc.html). Инлайновые
+   стили артбордов переписаны в классы по одной причине: инлайн не умеет
+   медиазапросов, а без мобильной вёрстки Google индексирует страницу как
+   сломанную. Величины — цвета, тени, радиусы — перенесены из макета один
+   в один, менять их на глаз не надо. */
+
+:root {
+  color-scheme: light;
+
+  --page: #dfe2e8;
+  --card-from: rgb(233 238 246);
+  --card-to: rgb(245 245 247);
+
+  --ink: rgb(29 29 31);
+  --ink-2: rgb(90 90 96);
+  --ink-3: rgb(110 110 115);
+  --ink-4: rgb(142 142 147);
+
+  --accent: rgb(0 122 255);
+  --accent-dim: rgb(0 108 232);
+  --good: rgb(52 199 89);
+
+  --hair: rgb(0 0 0 / 0.08);
+  --hair-soft: rgb(0 0 0 / 0.06);
+  --wash: rgb(29 29 31 / 0.06);
+
+  --sans: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  --shell: 1120px;
+  --pad: 56px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+img { max-width: 100%; height: auto; display: block; }
+
+/* Клавиатурная навигация должна быть видна на любом фоне. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  padding: 10px 16px; background: #fff; border-radius: 0 0 10px 0;
+}
+.skip:focus { left: 0; }
+
+/* ── каркас ───────────────────────────────────────────────────────── */
+
+.page { padding: 56px 64px 0; }
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 32px 80px -28px rgb(0 0 0 / 0.4);
+  background: linear-gradient(170deg, var(--card-from), var(--card-to));
+}
+
+.band { padding: 76px var(--pad); border-top: 1px solid var(--hair-soft); }
+.band--tint { background: rgb(255 255 255 / 0.55); }
+
+h2, h3 { letter-spacing: -0.03em; text-wrap: balance; }
+
+.kicker {
+  margin: 0 0 20px;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent);
+}
+.kicker--mute { color: var(--ink-4); letter-spacing: 0.1em; }
+
+.band > h3 { margin: 0 0 40px; font-size: 34px; font-weight: 700; }
+
+/* ── шапка ────────────────────────────────────────────────────────── */
+
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+  padding: 22px var(--pad);
+  border-bottom: 1px solid var(--hair);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.brand__name { font-family: var(--mono); font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+.brand__sub  { font-family: var(--mono); font-size: 12px; color: var(--ink-4); }
+
+/* Логотип повторяет иконку из icon_windows.go: пузырь, хвост, тусклый
+   второй за ним. Абсолютные пиксели, потому что фигура выверена в 26px
+   и на другом размере разъезжается. */
+.mark { position: relative; display: inline-block; width: 26px; height: 26px; border-radius: 5.5px; background: var(--accent); flex-shrink: 0; }
+.mark i { position: absolute; display: block; }
+.mark .m-back { left: 14px; top: 13px; width: 8px; height: 8px; border-radius: 2px; background: rgb(255 255 255 / 0.66); }
+.mark .m-tail { left: 7px; top: 13.5px; width: 4.5px; height: 4.5px; transform: rotate(45deg); background: #fff; }
+.mark .m-bub  { left: 5px; top: 6.5px; width: 16px; height: 9px; border-radius: 2.5px; background: #fff; display: flex; align-items: center; justify-content: center; gap: 1.5px; }
+.mark .m-bub b { width: 2.5px; height: 2.5px; border-radius: 999px; background: var(--accent); }
+
+.nav__links { display: flex; align-items: center; gap: 26px; }
+/* :not(.btn) обязателен: без него `.nav__links a` (0,1,1) перебивает
+   `.btn--pill` (0,1,0) и красит белый текст кнопки в серый по синему. */
+.nav__links a:not(.btn) { font-size: 14px; color: var(--ink-3); text-decoration: none; }
+.nav__links a:not(.btn):hover { color: var(--ink); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 0; cursor: pointer; text-decoration: none;
+  font-family: inherit; font-weight: 600;
+  transition: background-color 140ms ease;
+}
+.btn--pill { padding: 9px 18px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 14px; }
+.btn--pill:hover { background: var(--accent-dim); color: #fff; }
+.btn--lead {
+  padding: 15px 26px; border-radius: 14px;
+  background: var(--accent); color: #fff; font-size: 16px;
+  box-shadow: 0 10px 28px -10px rgb(0 122 255 / 0.65);
+}
+.btn--lead:hover { background: var(--accent-dim); color: #fff; }
+.btn--ghost {
+  padding: 14px 24px; border-radius: 14px; font-size: 15px;
+  background: #fff; color: var(--ink); border: 1px solid var(--hair);
+  box-shadow: 0 2px 8px -4px rgb(0 0 0 / 0.12);
+}
+.btn--ghost:hover { background: rgb(255 255 255 / 0.6); color: var(--ink); }
+
+/* ── герой ────────────────────────────────────────────────────────── */
+
+.hero { position: relative; padding: 72px var(--pad) 76px; overflow: hidden; }
+
+.hero__glow {
+  position: absolute; inset: -30%; pointer-events: none;
+  background:
+    radial-gradient(34rem 28rem at 8% 0%, rgb(120 160 255 / 0.36), transparent 62%),
+    radial-gradient(30rem 26rem at 92% 60%, rgb(255 170 200 / 0.28), transparent 64%);
+  filter: blur(14px);
+}
+
+.hero__grid {
+  position: relative;
+  display: grid; grid-template-columns: 1fr auto; gap: 48px;
+  align-items: center;
+}
+/* Без этого `1fr` берёт минимумом max-content своего элемента: колонка
+   раздувается под 400px макета, а не макет ужимается под колонку. */
+.hero__grid > *, .split > * { min-width: 0; }
+
+.hero h1 { margin: 0; font-size: 64px; line-height: 1.05; font-weight: 700; letter-spacing: -0.04em; text-wrap: balance; }
+.hero__lead { margin: 30px 0 0; font-size: 20px; line-height: 1.55; color: var(--ink-2); max-width: 36ch; text-wrap: pretty; }
+.hero__cta { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 38px; }
+.hero__fine { margin: 0; padding-left: 4px; font-size: 13.5px; line-height: 1.5; color: var(--ink-4); }
+
+/* Резиновая ширина с потолком, а не жёсткие 400px. С жёсткими колонка
+   грида разрасталась под макет, макет вылезал за .shell и молча срезался
+   его overflow:hidden — на телефоне окно было обрублено с обоих боков. */
+.hero__shot {
+  width: 100%; max-width: 400px;
+  transform: scale(0.92); transform-origin: center right;
+  box-shadow: 0 26px 64px -22px rgb(0 0 0 / 0.42), 0 0 0 1px rgb(0 0 0 / 0.06);
+  border-radius: 12px; overflow: hidden;
+}
+
+/* ── что умеет ────────────────────────────────────────────────────── */
+
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+.card {
+  border-radius: 16px; border: 1px solid var(--hair); background: #fff;
+  padding: 26px; box-shadow: 0 2px 8px -4px rgb(0 0 0 / 0.1);
+}
+.card svg { margin-bottom: 16px; }
+.card__glyph { display: block; font-size: 22px; line-height: 1; margin-bottom: 16px; }
+.card h4 { margin: 0 0 6px; font-size: 18px; font-weight: 600; letter-spacing: 0; }
+.card p  { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-3); }
+
+.card__swatches { display: flex; gap: 5px; margin-bottom: 16px; }
+.card__swatches span { width: 20px; height: 20px; border-radius: 5px; }
+
+/* ── реакции ──────────────────────────────────────────────────────── */
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.split h3 { margin: 0 0 16px; font-size: 34px; font-weight: 700; }
+.split__lead { margin: 0 0 28px; font-size: 17px; line-height: 1.6; color: var(--ink-3); max-width: 42ch; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 34px; max-width: 46ch; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px 7px 11px; border-radius: 999px;
+  background: #fff; border: 1px solid rgb(0 0 0 / 0.07);
+  font-size: 14px; white-space: nowrap;
+  box-shadow: 0 2px 6px -3px rgb(0 0 0 / 0.14);
+}
+.chip em { font-style: normal; font-size: 18px; }
+.chip--done { background: rgb(52 199 89 / 0.12); border-color: rgb(52 199 89 / 0.3); font-weight: 500; box-shadow: none; }
+
+.scores { display: flex; align-items: flex-end; gap: 26px; flex-wrap: wrap; }
+.score { display: flex; align-items: center; gap: 4px; }
+.score b { font-size: 38px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.score i { font-style: normal; font-size: 24px; line-height: 1; }
+
+.orders { display: flex; flex-direction: column; gap: 14px; justify-self: center; width: 100%; max-width: 360px; }
+
+.order {
+  overflow: hidden; border-radius: 14px; border: 1px solid var(--hair);
+  box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.18), 0 2px 6px -2px rgb(0 0 0 / 0.08);
+  background: rgb(255 255 255 / 0.97);
+}
+.order--soon { border-style: dashed; border-color: rgb(0 122 255 / 0.35); background: rgb(255 255 255 / 0.8); box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.12); }
+.order__top { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+.order__emoji { font-size: 26px; line-height: 1; }
+.order__body { min-width: 0; flex: 1; }
+.order__body p { margin: 0; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order__title { font-size: 15px; font-weight: 600; }
+.order__who { font-size: 12px; color: var(--ink-3); }
+.order__time { align-self: flex-start; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink-4); }
+.order__tag { align-self: flex-start; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: rgb(0 122 255 / 0.1); color: var(--accent); }
+.order__foot {
+  display: flex; min-height: 42px; align-items: center; gap: 8px;
+  border-top: 1px solid var(--hair); background: rgb(255 255 255 / 0.5); padding: 0 12px;
+}
+.order__state { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--ink-3); }
+.order__state--yes { color: var(--good); }
+
+/* Складка ответов: три кружка внахлёст, как в ReplyStack. */
+.stack { position: relative; height: 32px; flex-shrink: 0; width: 74px; }
+.stack span {
+  position: absolute; top: 0; height: 32px; width: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px; background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1), inset 0 0.5px 0 rgb(255 255 255 / 0.5), inset 0 0 0 1px rgb(0 0 0 / 0.1);
+  font-size: 20px;
+}
+.stack span:nth-child(1) { right: 46px; z-index: 10; }
+.stack span:nth-child(2) { right: 25px; z-index: 9; }
+.stack span:nth-child(3) { right: 4px;  z-index: 8; }
+
+/* ── темы ─────────────────────────────────────────────────────────── */
+
+.skins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.skin {
+  border-radius: 14px; overflow: hidden; border: 1px solid var(--hair);
+  box-shadow: 0 2px 8px -4px rgb(0 0 0 / 0.12);
+}
+.skin__swatch { height: 74px; position: relative; }
+.skin__swatch b { position: absolute; left: 12px; bottom: 12px; width: 22px; height: 22px; border-radius: 6px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.18); }
+.skin__name { margin: 0; padding: 10px 12px; background: #fff; font-size: 14px; font-weight: 500; }
+
+/* ── скриншоты ────────────────────────────────────────────────────── */
+
+.shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
+.shots figure { margin: 0; }
+.shots img {
+  width: 100%; border-radius: 12px; border: 1px solid var(--hair);
+  box-shadow: 0 18px 44px -20px rgb(0 0 0 / 0.34);
+  background: #fff;
+}
+.shots figcaption { margin-top: 12px; font-size: 14px; color: var(--ink-3); }
+
+/* ── скачать ──────────────────────────────────────────────────────── */
+
+.grab { text-align: center; }
+.grab h3 { margin: 0 0 14px; font-size: 34px; font-weight: 700; }
+.grab p { margin: 0 auto 30px; max-width: 46ch; font-size: 17px; line-height: 1.6; color: var(--ink-3); }
+.grab__row { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+/* `p.grab__fine`, а не просто класс: `.grab p` выше по специфичности и
+   иначе навязывает свой нижний отступ в 30px, рассчитанный на текст
+   ПЕРЕД кнопками — а эта строка идёт после них и замыкает секцию.
+   Цвет намеренно --ink-3, а не более тусклый --ink-4: на плёнке
+   .band--tint тот даёт контраст 3.0:1 и не проходит порог AA для текста
+   мельче 18px, тогда как этот даёт 4.7:1. */
+.grab p.grab__fine { margin: 26px auto 0; max-width: 52ch; font-size: 14.5px; line-height: 1.6; color: var(--ink-3); }
+.grab__fine a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.grab__fine a:hover { text-decoration: underline; }
+
+/* ── футер ────────────────────────────────────────────────────────── */
+
+.foot {
+  border-top: 1px solid var(--hair);
+  padding: 28px var(--pad);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 28px;
+  font-size: 13.5px;
+}
+.foot__who { display: inline-flex; align-items: baseline; gap: 10px; }
+.foot__who > span { opacity: 0.55; }
+.foot__dot { opacity: 0.3; }
+.foot a { text-decoration: none; color: inherit; opacity: 0.6; }
+.foot a:hover { opacity: 1; color: var(--accent); }
+/* wrap, а не nowrap: три ссылки на 375px влезают ровно впритык, и
+   четвёртая (или более длинная) порвала бы футер вбок. */
+.foot__nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 10px 22px; }
+
+.tail { padding: 26px 0 44px; text-align: center; font-size: 12.5px; color: rgb(29 29 31 / 0.4); }
+
+/* ── макет окна 400×780 ───────────────────────────────────────────── */
+
+@keyframes lc-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.win {
+  position: relative;
+  width: 100%; max-width: 400px; height: 780px;
+  overflow: hidden; border-radius: 12px;
+  background: linear-gradient(160deg, rgb(233 238 246), rgb(245 245 247));
+  font-family: var(--sans); font-feature-settings: "tnum" 1;
+  color: var(--ink);
+}
+.win__glow {
+  position: absolute; inset: -20%; pointer-events: none;
+  background:
+    radial-gradient(30rem 26rem at 10% 5%, rgb(120 160 255 / 0.3), transparent 60%),
+    radial-gradient(28rem 24rem at 90% 95%, rgb(255 170 200 / 0.24), transparent 62%);
+  filter: blur(12px);
+}
+.win__col { position: relative; display: flex; flex-direction: column; height: 100%; }
+
+.win__bar {
+  position: relative; z-index: 20;
+  display: flex; height: 56px; flex-shrink: 0; align-items: center; gap: 4px;
+  padding: 0 6px; border-bottom: 1px solid var(--hair);
+  background-color: rgb(255 255 255 / 0.86);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+}
+.win__icon {
+  display: flex; height: 36px; width: 36px; flex-shrink: 0;
+  align-items: center; justify-content: center;
+  border: 0; background: none; border-radius: 999px; color: var(--ink-3);
+}
+.win__ava { position: relative; flex-shrink: 0; width: 34px; height: 34px; }
+.win__ava > span {
+  display: flex; height: 100%; width: 100%; align-items: center; justify-content: center;
+  border-radius: 999px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+  font-size: 17.7px; line-height: 1; background: hsl(212 70% 92% / 0.9);
+}
+.win__dot { position: absolute; bottom: 0; right: 0; width: 9.5px; height: 9.5px; border-radius: 999px; background: var(--good); box-shadow: 0 0 0 2px #fff; }
+.win__who { margin-left: 6px; min-width: 0; flex: 1; }
+.win__who p { margin: 0; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.win__who .n { font-size: 15px; font-weight: 600; }
+.win__who .n span { font-weight: 400; color: var(--ink-3); }
+.win__who .s { font-size: 12px; color: var(--ink-3); }
+
+.win__feed {
+  min-height: 0; flex: 1; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: 6px; padding: 12px;
+}
+.win__day { padding: 8px 0; text-align: center; }
+.win__day span { border-radius: 999px; background: var(--wash); padding: 2px 10px; font-size: 11px; color: var(--ink-3); }
+
+.row { display: flex; }
+.row--them { justify-content: flex-start; }
+.row--me { justify-content: flex-end; }
+
+.bub {
+  animation: lc-in 160ms ease-out both;
+  max-width: 82%; border-radius: 18px; padding: 8px 12px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+}
+.bub p { margin: 0; white-space: pre-wrap; overflow-wrap: break-word; font-size: 15px; line-height: 1.375; }
+.bub--them { border-bottom-left-radius: 6px; background-color: rgb(255 255 255 / 0.97); border: 1px solid var(--hair); }
+.bub--me { border-bottom-right-radius: 6px; background: var(--accent); color: #fff; }
+.bub__meta { margin-top: 2px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink-4); }
+.bub--me .bub__meta { color: rgb(255 255 255 / 0.7); }
+.bub__ticks { display: inline-block; min-width: 1.8em; text-align: right; }
+
+.win .order { width: 82%; max-width: 300px; animation: lc-in 160ms ease-out both; }
+.win__done { border: 0; background: none; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 500; font-family: inherit; color: var(--accent); flex-shrink: 0; }
+
+.win__score { display: flex; align-items: center; gap: 6px; padding: 2px 4px; }
+.win__score b { font-size: 44px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: color-mix(in oklab, rgb(255 149 0), rgb(52 199 89) 80%); transform: rotate(-4deg); }
+.win__score s { text-decoration: none; font-size: 18px; font-weight: 600; line-height: 1; color: var(--ink-4); }
+.win__score i { font-style: normal; font-size: 29px; line-height: 1; transform: rotate(5.2deg); }
+
+.win__quick { display: flex; align-items: center; gap: 6px; padding: 6px 8px 8px; }
+.pill {
+  display: flex; flex-shrink: 0; align-items: center; gap: 4px;
+  border: 0; border-radius: 999px; background: rgb(255 255 255 / 0.7);
+  padding: 4px 10px; font-size: 13px; font-family: inherit;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1), inset 0 0.5px 0 rgb(255 255 255 / 0.5), inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+.pill span { color: var(--ink-3); }
+.pill--round { height: 28px; width: 28px; justify-content: center; padding: 0; font-size: 15px; line-height: 1; }
+.pill--solid { background: #fff; color: var(--ink-3); }
+.win__quick > div { display: flex; min-width: 0; flex: 1; gap: 6px; overflow: hidden; }
+
+.win__composer {
+  display: flex; align-items: flex-end; gap: 2px;
+  border-top: 1px solid var(--hair); padding: 8px 6px;
+  background-color: rgb(255 255 255 / 0.86);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+}
+.win__composer .win__icon { margin-bottom: 1px; }
+.win__field { position: relative; min-width: 0; flex: 1; }
+.win__field > div {
+  min-height: 36px; width: 100%; border-radius: 18px;
+  background: var(--wash); padding: 8px 44px 8px 12px;
+  font-size: 15px; line-height: 20px; color: var(--ink-4);
+}
+.win__send { position: absolute; bottom: 0; right: 4px; height: 36px; width: 36px; display: flex; align-items: center; justify-content: center; border: 0; background: none; color: var(--ink-4); }
+
+/* ── экраны поуже ─────────────────────────────────────────────────── */
+
+@media (max-width: 1040px) {
+  :root { --pad: 40px; }
+  .page { padding: 40px 32px 0; }
+  /* minmax(0, 1fr), а не 1fr: иначе колонка растёт под макет окна. */
+  .hero__grid { grid-template-columns: minmax(0, 1fr); gap: 56px; justify-items: center; }
+  .hero__shot { transform: none; }
+  .hero h1 { font-size: 52px; }
+  .split { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .skins { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  :root { --pad: 24px; --shell: 100%; }
+  .page { padding: 24px 16px 0; }
+  .band { padding: 56px var(--pad); }
+  .shell { border-radius: 14px; }
+
+  /* Разделы уезжают: на телефоне остаётся марка и «Скачать». */
+  .nav__links a:not(.btn) { display: none; }
+
+  .hero { padding: 48px var(--pad) 56px; }
+  .hero h1 { font-size: 38px; }
+  .hero__lead { font-size: 17px; }
+  .band > h3, .split h3, .grab h3 { font-size: 27px; }
+
+  .cards, .shots { grid-template-columns: minmax(0, 1fr); }
+  .skins { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .foot { flex-direction: column; align-items: flex-start; }
+  .foot__nav { margin-left: 0; }
+}
+
+@media (max-width: 400px) {
+  .win { height: 700px; }
+}
